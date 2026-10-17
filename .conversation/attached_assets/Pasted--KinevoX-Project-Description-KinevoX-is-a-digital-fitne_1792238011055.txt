@@ -1,0 +1,33 @@
+# KinevoX — Project Description
+
+**KinevoX** is a digital fitness and wellness platform designed to help beginners build healthier lifestyles through personalized workout plans, exercise guidance, healthy habits, and progress tracking.
+
+The platform will provide a simple, accessible experience that allows users to define their goals, identify their fitness level, select available equipment, and receive suitable workout recommendations.
+
+## Main Objectives
+- Create personalized workout plans based on user preferences and fitness levels.
+- Provide an exercise library with instructions and relevant media.
+- Encourage healthy habits related to sleep, hydration, balanced nutrition, and recovery.
+- Track workout completion and user progress.
+- Offer an AI-powered assistant for general fitness and wellness guidance, with appropriate safety limitations.
+- Support Arabic and English from the initial development stage.
+
+## Target Audience
+Beginners who want to improve their fitness, develop healthy habits, and monitor their progress through an easy-to-use digital platform.
+
+## Technology
+- HTML, CSS, and JavaScript
+- Vite for the development environment
+- Git and GitHub for version control
+- Supabase for authentication and database services in a later phase
+
+## Initial Scope
+The first version will focus on the homepage, bilingual interface, user onboarding questionnaire, reviewed exercise library, basic workout recommendations, and progress tracking.
+
+Advanced AI features, payments, mobile applications, and camera-based analysis will be considered in future versions.
+
+## Safety and Privacy
+KinevoX will provide general fitness and wellness information, not medical diagnosis or treatment. User data will be handled with appropriate privacy and security safeguards.
+
+## Long-Term Vision
+Build KinevoX into a scalable fitness and wellness company that combines technology, personalization, and practical guidance to help people make sustainable progress.

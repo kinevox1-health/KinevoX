@@ -1,44 +1,48 @@
-# [Project name]
+# KinevoX
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+KinevoX helps beginners build a practical fitness routine, explore simple movements, and track progress. Tagline: “Evolve Your Potential.”
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Use the managed `artifacts/kinevox: web` workflow to run the app in Replit.
+- On Windows, follow `artifacts/kinevox/README.md` to run the app in a local browser.
+- `pnpm --filter @workspace/kinevox run typecheck` — typecheck the KinevoX frontend.
+- `pnpm run typecheck` — typecheck all workspace packages.
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Frontend: React, Vite, TypeScript, and Wouter
+- Local persistence: browser `localStorage`
+- The shared API server and PostgreSQL packages exist in the workspace but are not used by the first KinevoX MVP.
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/kinevox/src/App.tsx` — app routes, bilingual copy, demonstration content, onboarding, recommendation rules, and local progress tracking.
+- `artifacts/kinevox/src/index.css` — KinevoX visual theme and responsive layout.
+- `artifacts/kinevox/README.md` — local Windows run instructions and first-version boundaries.
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The first version is a browser app intended to run locally on Windows, not a packaged desktop executable.
+- Keep the MVP free and local-first: no accounts, API services, or backend persistence.
+- Save only language, non-sensitive exercise preferences, and completed-session history in the browser.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- English and Arabic interface with LTR/RTL direction.
+- Preference onboarding, rule-based demonstration routine matching, exercise search/filter, session completion, and progress history.
+- Privacy page with a local-data clear action.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Build a free Windows-first prototype and improve it gradually from user feedback.
+- Keep Arabic and English support from the start.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The KinevoX Vite config requires both `PORT` and `BASE_PATH`; the Replit workflow supplies them. Set both in PowerShell for local Windows use.
+- The app's preference and progress data belongs to the browser profile on the device where it was entered.
 
 ## Pointers
 

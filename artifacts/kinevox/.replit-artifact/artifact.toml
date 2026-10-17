@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "KinevoX"
+description = "A free, local-first fitness and wellness MVP for beginners on Windows. KinevoX supports Arabic and English, collects lightweight onboarding preferences, offers clear rule-based workout recommendations, a reviewed exercise starter library, and local progress tracking without accounts or paid services."
+version = "1.0.0"
+id = "artifacts/kinevox"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23985
+
+[services.development]
+run = "pnpm --filter @workspace/kinevox run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/kinevox", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/kinevox/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23985"
+BASE_PATH = "/"

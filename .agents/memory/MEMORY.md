@@ -1,0 +1,1 @@
+- [Exercise-safety review boundary](exercise-safety-review-boundary.md) — keep starter workouts clearly unreviewed until a qualified review actually occurs.
