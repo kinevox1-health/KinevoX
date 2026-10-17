@@ -1,1 +1,2 @@
 - [Exercise-safety review boundary](exercise-safety-review-boundary.md) — keep starter workouts clearly unreviewed until a qualified review actually occurs.
+- [KinevoX roadmap](kinevox-roadmap.md) — build local foundations first; delay AI until trusted content and use pilot feedback to guide expansion.
