@@ -17,6 +17,10 @@ export type Level = 'new' | 'some';
 export type LocationChoice = 'home' | 'outdoors' | 'gym';
 export type Equipment = 'none' | 'basic' | 'gym';
 export type Safety = 'no' | 'yes' | 'prefer';
+export type ActivityLevel = 'sedentary' | 'light' | 'moderate';
+export type IntensityPreference = 'gentle' | 'balanced' | 'invigorating';
+export type JointFocus = 'general' | 'low-impact' | 'back-friendly';
+export type PreferredTime = 'morning' | 'afternoon' | 'evening';
 
 export type Preferences = {
   goal: Goal;
@@ -25,6 +29,10 @@ export type Preferences = {
   equipment: Equipment;
   daysPerWeek: number;
   sessionMinutes: number;
+  activityLevel?: ActivityLevel;
+  intensity?: IntensityPreference;
+  jointFocus?: JointFocus;
+  preferredTime?: PreferredTime;
 };
 
 /* ── Exercise catalogue ──────────────────────────────── */
@@ -142,4 +150,8 @@ export const DEFAULT_PREFERENCES: Preferences = {
   equipment: 'none',
   daysPerWeek: 3,
   sessionMinutes: 25,
+  activityLevel: 'sedentary',
+  intensity: 'gentle',
+  jointFocus: 'general',
+  preferredTime: 'morning',
 };

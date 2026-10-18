@@ -45,7 +45,7 @@ export const DEFAULT_STORAGE_DATA: KinevoxStorageData = {
 export function isPreferences(value: unknown): value is Preferences {
   if (!value || typeof value !== 'object') return false;
   const candidate = value as Record<string, unknown>;
-  return (
+  const baseValid = (
     ['get-moving', 'build-strength', 'feel-mobile'].includes(String(candidate.goal)) &&
     ['new', 'some'].includes(String(candidate.experience)) &&
     ['home', 'outdoors', 'gym'].includes(String(candidate.location)) &&
@@ -55,6 +55,12 @@ export function isPreferences(value: unknown): value is Preferences {
     typeof candidate.daysPerWeek === 'number' &&
     typeof candidate.sessionMinutes === 'number'
   );
+  if (!baseValid) return false;
+  if (candidate.activityLevel !== undefined && !['sedentary', 'light', 'moderate'].includes(String(candidate.activityLevel))) return false;
+  if (candidate.intensity !== undefined && !['gentle', 'balanced', 'invigorating'].includes(String(candidate.intensity))) return false;
+  if (candidate.jointFocus !== undefined && !['general', 'low-impact', 'back-friendly'].includes(String(candidate.jointFocus))) return false;
+  if (candidate.preferredTime !== undefined && !['morning', 'afternoon', 'evening'].includes(String(candidate.preferredTime))) return false;
+  return true;
 }
 
 export function isWorkoutLog(value: unknown): value is WorkoutLog {

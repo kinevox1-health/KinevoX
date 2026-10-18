@@ -62,6 +62,7 @@ import {
   getNextDayIndex,
 } from './services/workoutService';
 import { WorkoutSessionPage } from './pages/WorkoutSessionPage';
+import { OnboardingWizardPage } from './pages/OnboardingWizardPage';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { AuthPage } from './pages/AuthPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -737,236 +738,23 @@ function HomePage() {
 }
 
 function OnboardingPage() {
-  const { t, lang, preferences, savePreferences, setSafety, toast } = useApp();
-  const [step, setStep] = useState(0);
-  const [safe, setSafe] = useState<Safety | null>(null);
-  const [draft, setDraft] = useState<Preferences>(preferences || defaults);
-  const goalOptions: Goal[] = ['get-moving', 'build-strength', 'feel-mobile'];
-  const update = (partial: Partial<Preferences>) =>
-    setDraft((current) => ({ ...current, ...partial }));
-  const finish = () => {
-    if (!safe) return;
-    setSafety(safe);
-    savePreferences(draft);
-    toast(t('saved'));
-  };
-  const [, setPath] = useLocation();
+  const { lang, preferences, savePreferences, safety, setSafety, toast } = useApp();
 
   return (
-    <div className="animate-in">
-      <div className="page-head">
-        <div className="eyebrow">
-          <Sparkles size={14} />
-          {t('tagline')}
-        </div>
-        <h1 className="page-title">{t('onboarding')}</h1>
-        <p className="page-subtitle">{t('onboardIntro')}</p>
-      </div>
-      <section className="form-card">
-        <div className="stepper" aria-label={`${step + 1} / 3`}>
-          {[0, 1, 2].map((i) => (
-            <span key={i} style={{ display: 'contents' }}>
-              <span className={`step-dot ${step >= i ? 'active' : ''}`}>
-                {step > i ? <Check size={14} /> : i + 1}
-              </span>
-              {i < 2 && <span className="step-line" />}
-            </span>
-          ))}
-        </div>
-        {step === 0 && (
-          <div>
-            <h2 className="form-title">{t('safetyTitle')}</h2>
-            <p className="form-hint">{t('safetyHint')}</p>
-            <div className="safety-options">
-              {(['no', 'yes', 'prefer'] as Safety[]).map((value) => (
-                <button
-                  type="button"
-                  key={value}
-                  className={`safety-option ${safe === value ? 'selected' : ''}`}
-                  onClick={() => setSafe(value)}
-                  data-testid={`button-safety-${value}`}
-                  aria-pressed={safe === value}
-                >
-                  <span className="radio-dot" />
-                  <span>
-                    <strong>
-                      {t(value === 'no' ? 'safeNo' : value === 'yes' ? 'safeYes' : 'safePrefer')}
-                    </strong>
-                    <span>
-                      {t(value === 'no' ? 'safeNoDesc' : value === 'yes' ? 'safePause' : 'safePreferDesc')}
-                    </span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {step === 1 && (
-          <div>
-            <h2 className="form-title">{t('stepGoal')}</h2>
-            <p className="form-hint">{t('goalHint')}</p>
-            <div className="option-grid">
-              {goalOptions.map((goal) => (
-                <button
-                  type="button"
-                  className={`option ${draft.goal === goal ? 'selected' : ''}`}
-                  key={goal}
-                  onClick={() => update({ goal })}
-                  aria-pressed={draft.goal === goal}
-                  data-testid={`button-goal-${goal}`}
-                >
-                  <strong>{t(goalKey(goal))}</strong>
-                  <span>
-                    {t(
-                      goal === 'get-moving'
-                        ? 'goalMoveDesc'
-                        : goal === 'build-strength'
-                        ? 'goalStrengthDesc'
-                        : 'goalMobilityDesc'
-                    )}
-                  </span>
-                </button>
-              ))}
-            </div>
-            <label className="field-label" htmlFor="experience">
-              {t('experience')}
-            </label>
-            <select
-              id="experience"
-              className="select-control"
-              value={draft.experience}
-              onChange={(e) => update({ experience: e.target.value as Level })}
-              data-testid="select-experience"
-            >
-              <option value="new">{t('new')}</option>
-              <option value="some">{t('some')}</option>
-            </select>
-          </div>
-        )}
-        {step === 2 && (
-          <div>
-            <h2 className="form-title">
-              {lang === 'ar' ? 'اجعل الروتين مناسباً لك' : 'Shape a routine that fits'}
-            </h2>
-            <p className="form-hint">{t('onboardIntro')}</p>
-            <label className="field-label" htmlFor="location">
-              {t('location')}
-            </label>
-            <select
-              id="location"
-              className="select-control"
-              value={draft.location}
-              onChange={(e) => update({ location: e.target.value as LocationChoice })}
-              data-testid="select-location"
-            >
-              <option value="home">{t('homeLoc')}</option>
-              <option value="outdoors">{t('outdoors')}</option>
-              <option value="gym">{t('gym')}</option>
-            </select>
-            <label className="field-label" htmlFor="equipment">
-              {t('equipment')}
-            </label>
-            <select
-              id="equipment"
-              className="select-control"
-              value={draft.equipment}
-              onChange={(e) => update({ equipment: e.target.value as Equipment })}
-              data-testid="select-equipment"
-            >
-              <option value="none">{t('none')}</option>
-              <option value="basic">{t('basic')}</option>
-              <option value="gym">{t('gym')}</option>
-            </select>
-            <label className="field-label" htmlFor="days">
-              {t('days')}
-            </label>
-            <select
-              id="days"
-              className="select-control"
-              value={draft.daysPerWeek}
-              onChange={(e) => update({ daysPerWeek: Number(e.target.value) })}
-              data-testid="select-days"
-            >
-              {[2, 3, 4, 5].map((n) => (
-                <option value={n} key={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-            <label className="field-label" htmlFor="minutes">
-              {t('minutesChoice')}
-            </label>
-            <select
-              id="minutes"
-              className="select-control"
-              value={draft.sessionMinutes}
-              onChange={(e) => update({ sessionMinutes: Number(e.target.value) })}
-              data-testid="select-session-minutes"
-            >
-              {[15, 20, 25, 30, 40].map((n) => (
-                <option value={n} key={n}>
-                  {n} {t('duration')}
-                </option>
-              ))}
-            </select>
-            <p className="form-hint" style={{ marginTop: 15 }}>
-              {t('equipmentFit')}
-            </p>
-          </div>
-        )}
-        <div className="form-actions">
-          {step > 0 ? (
-            <button
-              type="button"
-              className="button outline"
-              onClick={() => setStep(step - 1)}
-              data-testid="button-onboarding-back"
-            >
-              <ArrowLeft size={16} />
-              {t('back')}
-            </button>
-          ) : (
-            <span />
-          )}
-          {step < 2 ? (
-            <button
-              type="button"
-              disabled={step === 0 && !safe}
-              className="button dark"
-              onClick={() => {
-                if (step === 0 && safe && safe !== 'no') {
-                  setSafety(safe);
-                  setPath('/');
-                  return;
-                }
-                setStep(step + 1);
-              }}
-              data-testid="button-onboarding-next"
-            >
-              {t('next')}
-              <ArrowRight size={16} />
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="button dark"
-              disabled={!safe}
-              onClick={() => {
-                finish();
-                setPath(safe === 'yes' || safe === 'prefer' ? '/' : '/plan');
-              }}
-              data-testid="button-onboarding-finish"
-            >
-              {t('finish')}
-              <Check size={16} />
-            </button>
-          )}
-        </div>
-      </section>
-      <div style={{ maxWidth: 800, marginTop: 16 }}>
-        <Disclosure />
-      </div>
-    </div>
+    <OnboardingWizardPage
+      lang={lang}
+      initialPreferences={preferences}
+      initialSafety={safety}
+      onSavePreferences={savePreferences}
+      onSetSafety={setSafety}
+      onComplete={() =>
+        toast(
+          lang === 'ar'
+            ? 'تم حفظ وتخصيص خطتك التدريبية بنجاح!'
+            : 'Your personalized fitness plan is ready!'
+        )
+      }
+    />
   );
 }
 
