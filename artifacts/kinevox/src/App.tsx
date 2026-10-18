@@ -25,6 +25,7 @@ import {
   Sparkles,
   Trash2,
   TrendingUp,
+  User,
   Waves,
   Zap,
 } from 'lucide-react';
@@ -61,6 +62,10 @@ import {
   getNextDayIndex,
 } from './services/workoutService';
 import { WorkoutSessionPage } from './pages/WorkoutSessionPage';
+import { AuthProvider, useAuth } from './hooks/useAuth';
+import { AuthPage } from './pages/AuthPage';
+import { ProfilePage } from './pages/ProfilePage';
+import type { UserCloudData } from './services/firestoreService';
 
 const defaults: Preferences = DEFAULT_PREFERENCES;
 
@@ -69,6 +74,8 @@ const copy: Record<string, Record<Lang, string>> = {
   plan: { en: 'Your plan', ar: 'خطتك' },
   library: { en: 'Exercises', ar: 'التمارين' },
   progress: { en: 'Progress', ar: 'التقدم' },
+  profile: { en: 'Profile', ar: 'الملف الشخصي' },
+  signIn: { en: 'Sign In', ar: 'تسجيل الدخول' },
   privacy: { en: 'Privacy', ar: 'الخصوصية' },
   tagline: { en: 'Evolve Your Potential.', ar: 'طوّر إمكاناتك.' },
   greeting: { en: 'A little movement. A lot of momentum.', ar: 'حركة بسيطة، وزخم أكبر.' },
@@ -234,6 +241,36 @@ const storageWarning: Record<Lang, string> = {
   ar: 'تعذر على هذا المتصفح حفظ بيانات KinevoX أو مسحها. قد لا تبقى التغييرات بعد إغلاق الصفحة، وربما تظل البيانات المحفوظة في المتصفح.',
 };
 
+function TopbarUser() {
+  const { user } = useAuth();
+  const { t } = useApp();
+
+  if (user) {
+    const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+    return (
+      <Link href="/profile" className="topbar-auth-btn" data-testid="link-topbar-profile" aria-label={t('profile')}>
+        <span className="topbar-user-avatar">
+          {user.photoURL ? (
+            <img src={user.photoURL} alt="" referrerPolicy="no-referrer" />
+          ) : (
+            initial
+          )}
+        </span>
+        <span className="topbar-user-name">
+          {user.displayName?.split(' ')[0] || user.email?.split('@')[0] || t('profile')}
+        </span>
+      </Link>
+    );
+  }
+
+  return (
+    <Link href="/auth" className="topbar-auth-btn" data-testid="link-topbar-signin">
+      <User size={15} />
+      <span>{t('signIn')}</span>
+    </Link>
+  );
+}
+
 function AppShell({ children }: { children: any }) {
   const [data, setData] = useState<KinevoxStorageData>(() => readStoredData());
   const skipNextPersist = useRef(false);
@@ -376,66 +413,80 @@ function AppShell({ children }: { children: any }) {
 
   return (
     <AppContext.Provider value={api}>
-      <div className="app-shell" dir={dir}>
-        <header className="topbar">
-          <Link
-            href="/"
-            className="brand"
-            data-testid="link-brand-home"
-            aria-label={lang === 'ar' ? 'الصفحة الرئيسية KinevoX' : 'KinevoX home'}
-          >
-            <span className="brand-mark">
-              <Activity size={21} />
-            </span>
-            <span>
-              <span className="brand-name">KinevoX</span>
-              <span className="brand-tag">{t('tagline')}</span>
-            </span>
-          </Link>
-          <div className="header-tools">
-            {data.activeSession && (
-              <Link
-                href="/session"
-                className="pill subtle animate-pulse"
-                style={{ background: '#eaf4eb', color: '#165e49', fontWeight: 800 }}
-                data-testid="link-topbar-resume-session"
-              >
-                <Play size={12} fill="#165e49" />
-                {t('activeSessionNotice')}
-              </Link>
-            )}
-            <button
-              className="lang-toggle"
-              onClick={toggleLanguage}
-              data-testid="button-language-toggle"
-              aria-label={t('language')}
-            >
-              <Languages size={16} />
-              {t('language')}
-            </button>
-          </div>
-        </header>
-
-        <nav className="nav" aria-label={lang === 'ar' ? 'التنقل الرئيسي' : 'Main navigation'}>
-          {[
-            { href: '/', key: 'home', icon: Home },
-            { href: '/plan', key: 'plan', icon: Sparkles },
-            { href: '/exercises', key: 'library', icon: BookOpen },
-            { href: '/progress', key: 'progress', icon: TrendingUp },
-            { href: '/privacy', key: 'privacy', icon: ShieldCheck },
-          ].map(({ href, key, icon: Icon }) => (
+      <AuthProvider
+        onSyncFromCloud={(cloud: UserCloudData) => {
+          setData((current) => ({
+            ...current,
+            language: cloud.language,
+            preferences: cloud.preferences,
+            activePlan: cloud.activePlan,
+            logs: cloud.logs,
+            sessions: cloud.sessions,
+          }));
+        }}
+      >
+        <div className="app-shell" dir={dir}>
+          <header className="topbar">
             <Link
-              key={href}
-              href={href}
-              className={`nav-link ${active === (href === '/' ? 'home' : href.slice(1)) ? 'active' : ''}`}
-              data-testid={`link-nav-${key}`}
-              aria-current={active === (href === '/' ? 'home' : href.slice(1)) ? 'page' : undefined}
+              href="/"
+              className="brand"
+              data-testid="link-brand-home"
+              aria-label={lang === 'ar' ? 'الصفحة الرئيسية KinevoX' : 'KinevoX home'}
             >
-              <Icon size={17} />
-              {t(key)}
+              <span className="brand-mark">
+                <Activity size={21} />
+              </span>
+              <span>
+                <span className="brand-name">KinevoX</span>
+                <span className="brand-tag">{t('tagline')}</span>
+              </span>
             </Link>
-          ))}
-        </nav>
+            <div className="header-tools">
+              {data.activeSession && (
+                <Link
+                  href="/session"
+                  className="pill subtle animate-pulse"
+                  style={{ background: '#eaf4eb', color: '#165e49', fontWeight: 800 }}
+                  data-testid="link-topbar-resume-session"
+                >
+                  <Play size={12} fill="#165e49" />
+                  {t('activeSessionNotice')}
+                </Link>
+              )}
+              <TopbarUser />
+              <button
+                className="lang-toggle"
+                onClick={toggleLanguage}
+                data-testid="button-language-toggle"
+                aria-label={t('language')}
+              >
+                <Languages size={16} />
+                {t('language')}
+              </button>
+            </div>
+          </header>
+
+          <nav className="nav" aria-label={lang === 'ar' ? 'التنقل الرئيسي' : 'Main navigation'}>
+            {[
+              { href: '/', key: 'home', icon: Home },
+              { href: '/plan', key: 'plan', icon: Sparkles },
+              { href: '/exercises', key: 'library', icon: BookOpen },
+              { href: '/progress', key: 'progress', icon: TrendingUp },
+              { href: '/profile', key: 'profile', icon: User },
+              { href: '/privacy', key: 'privacy', icon: ShieldCheck },
+            ].map(({ href, key, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`nav-link ${active === (href === '/' ? 'home' : href.slice(1)) ? 'active' : ''}`}
+                data-testid={`link-nav-${key}`}
+                aria-current={active === (href === '/' ? 'home' : href.slice(1)) ? 'page' : undefined}
+              >
+                <Icon size={17} />
+                {t(key)}
+              </Link>
+            ))}
+          </nav>
 
         <main className="main">
           {storageError && (
@@ -457,6 +508,7 @@ function AppShell({ children }: { children: any }) {
           </div>
         )}
       </div>
+      </AuthProvider>
     </AppContext.Provider>
   );
 }
@@ -1489,6 +1541,38 @@ function NotFoundPage() {
   );
 }
 
+function AuthRouteWrapper() {
+  const { lang } = useApp();
+  const [, setLocation] = useLocation();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      setLocation('/profile');
+    }
+  }, [user, setLocation]);
+
+  return (
+    <AuthPage
+      lang={lang}
+      onGuestContinue={() => setLocation('/')}
+    />
+  );
+}
+
+function ProfileRouteWrapper() {
+  const { lang, preferences, logs, sessions, clearData } = useApp();
+  return (
+    <ProfilePage
+      lang={lang}
+      preferences={preferences}
+      logs={logs}
+      sessions={sessions}
+      onClearData={clearData}
+    />
+  );
+}
+
 function RoutedPages() {
   return (
     <Switch>
@@ -1498,6 +1582,8 @@ function RoutedPages() {
       <Route path="/session" component={SessionRouteWrapper} />
       <Route path="/exercises" component={LibraryPage} />
       <Route path="/progress" component={ProgressPage} />
+      <Route path="/auth" component={AuthRouteWrapper} />
+      <Route path="/profile" component={ProfileRouteWrapper} />
       <Route path="/privacy" component={PrivacyPage} />
       <Route component={NotFoundPage} />
     </Switch>
